@@ -20,11 +20,13 @@ export default function Terms() {
 
       <h2>Your data</h2>
       <p>
-        A CV is read in your browser; its text and links are sent to our server and to an AI
-        model provider to produce the verdict, then discarded. For each check we keep the GitHub
+        A CV is read in your browser; its text and links are sent to our server and to Anthropic's
+        API (Claude) to produce the verdict, then discarded. Anthropic doesn't train on this data
+        and deletes it within 30 days. For each check we keep the GitHub
         username, avatar and score, so the leaderboard can show it. Anyone can add a checked
         GitHub profile to the leaderboard; it then shows that profile's username, avatar and
-        latest score. To have a profile removed, write to us. We also keep each verdict for 30
+        latest score, with no time limit; a new check of that profile updates its score. To have a
+        profile removed, write to us. We also keep each verdict for 30
         days, so that checking the same unchanged profile again gives the same verdict. We use no
         tracking cookies. Share cards are drawn in your browser and never sent to us.
       </p>

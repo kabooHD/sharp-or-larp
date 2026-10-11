@@ -2,73 +2,35 @@
 
 Drop a GitHub link, a CV, or both. The LARP meter tells you if they're sharp or larping.
 
+Try it: [sharporlarp.com](https://sharporlarp.com)
+
 ## Larp Alert
 This project was 99% vibe coded. 
 
-## Run locally
+## What it scans
 
-Requires Node.js 22.12+ and an [Anthropic API key](https://console.anthropic.com) (the verdict uses Claude Haiku 5.5).
+- **GitHub profile** (official API): bio, profile README, followers vs following
+- **Repos**: the 100 most recently pushed, own vs forks, empty ones, stars, commit counts
+- **Activity**: contributions and active weeks over the last year, bursts of repos created the same week, auto-commit repos full of identical messages
+- **Real collaboration**: PRs merged into other people's repos, and how big those repos are
+- **Top 5 projects** (pinned first, then most starred): README, issues opened by others, share of commits written by AI agents, AI builders (Lovable, Bolt, v0…)
+- **Their website** (from the bio): home page + up to 3 inner pages
+- **Optional CV** (PDF, read in your browser): its text, and every link in it gets opened
 
-Create a `.dev.vars` file:
+## How the score is built
 
-```
-GITHUB_TOKEN="github_pat_..."
-ANTHROPIC_API_KEY="sk-ant-..."
-TURNSTILE_SECRET="0x..."
-STRIPE_SECRET_KEY="sk_test_..."
-STRIPE_WEBHOOK_SECRET="whsec_..."
-```
+- **Facts, in plain code**: starts at 58% and moves with each signal
+  - Sharp: stars on a project they really worked on, more followers than following, steady contributions, PRs merged elsewhere
+  - Larp: flashy profile README with little work behind it, follow-farming, empty repos, more forks than own repos, fake auto-commits, zero stars, vibe-coded projects nobody uses, dead website
+- **Vibe, from Claude Haiku**: reads the texts (bio, READMEs, website, CV) and gives a gut feeling from "sharp" to "larp", plus the flags and the roast. It never picks the number.
+- **Both combined** as two witnesses: when facts and vibe agree, the score goes extreme; when they disagree, it lands in the middle
+- **Same unchanged profile = same verdict** (the vibe is cached for 30 days)
+- **Zones**: 0–19 Sharp · 20–39 Low · 40–59 Moderate · 60–79 High · 80+ LARP god
 
-`GITHUB_TOKEN` needs read-only access to public data. The Stripe keys are only needed for ads. Locally, use Cloudflare's test secret `TURNSTILE_SECRET="1x0000000000000000000000000000000AA"`.
+## Privacy
 
-```bash
-npm install
-npm run db:migrate
-npm run dev
-```
-
-Open `http://localhost:5173`. To test ad payments, forward Stripe's webhooks with the [Stripe CLI](https://docs.stripe.com/stripe-cli): `stripe listen --events checkout.session.completed,checkout.session.async_payment_succeeded --forward-to localhost:5173/api/stripe/webhook`.
-
-## Structure
-
-```
-src/                React front
-├── App.tsx         The page: form, meter, verdict, ad slots (paused: ADS_ENABLED), footer
-├── LarpMeter.tsx   The dial
-├── gauge.ts        The dial's geometry, shared with the share card
-├── Verdict.tsx     Roast, red and green flags
-├── Leaderboard.tsx The leaderboard under the meter, and the button that adds a profile to it
-├── useLeaderboard.ts Loads the leaderboard, and reloads it after a check or an add
-├── VerdictFlash.tsx  Quick flash of colored dots when a verdict lands
-├── ShareSheet.tsx  Share the score: LinkedIn, phone share menu, download
-├── shareCard.ts    Draws the score card image in the browser
-├── LoadingPhrase.tsx  Rotating "Cooking…" lines while it checks
-├── CvPicker.tsx    Picks the CV, rejects non-CVs right away, × to remove it
-├── AdSlots.tsx     Ads with their score, the "place my ad" offer, the buy form
-├── adImage.ts      Shrinks an ad's image to a small square JPEG
-├── zones.ts        The 5 LARP zones and their colors
-├── readCv.ts       Reads a PDF CV in the browser
-├── useTurnstile.ts Cloudflare's bot check on the form
-└── api.ts          Calls to our API
-worker/             API server (Cloudflare Worker)
-├── main.ts         Route menu: which route runs what, behind which guards
-├── guards.ts       Rate limits, same-site and bot checks
-├── budget.ts       The daily cap on analyses, counted in D1 for the whole site
-├── analyze.ts      POST /api/analyze, step by step
-├── github.ts       Fetches profile, repos and activity from GitHub
-├── cvCheck.ts      Tells if a text reads like a CV (used by front and server)
-├── cv.ts           Sorts and follows the CV's links
-├── web.ts          Visits their site (home + 3 inner pages) and opens CV links
-├── dossier.ts      Turns raw data into an evidence dossier
-├── score.ts        Scores the numbers, then blends in the LLM's gut feeling
-├── judge.ts        Asks Claude Haiku for its gut feeling on the texts
-├── vibeCache.ts    Keeps that gut feeling, so unchanged texts get the same verdict again
-├── checks.ts       Saves each score, so an ad or the leaderboard can show it untouched
-├── leaderboard.ts  The two boards (sharpest, larpiest), adding a profile, keeping scores current
-├── ads.ts          Ad slots, images, Stripe checkout and webhook (paused: ADS_ENABLED)
-└── types.ts        Shapes shared with the front, and ApiError
-migrations/         Database tables (D1)
-public/fonts/       Inter and IBM Plex Mono, self-hosted
-public/og.png       Link preview image
-public/_headers     Security headers for the site (CSP…)
-```
+- GitHub data is public; the scores and the leaderboard use only that.
+- A CV is read in your browser, sent to our server and to Claude (Anthropic's API) for the verdict, then discarded. We never store it.
+- Anthropic doesn't train on API data and deletes it within 30 days.
+- We keep the GitHub username, avatar and score of each check, and the verdict for 30 days so the same profile gets the same answer.
+- A profile added to the leaderboard stays there with its username, avatar, latest score and date, even after those 30 days. A new check of that profile updates its score. To have a profile removed, email s.mounier.contact@gmail.com.
