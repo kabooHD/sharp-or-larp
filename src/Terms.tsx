@@ -1,13 +1,13 @@
 export const CONTACT_EMAIL = 's.mounier.contact@gmail.com'
 
-// The terms page: what the site does, ads, refunds, data and how to reach us.
+// The terms page: what the site does, the leaderboard, data and how to reach us.
 export default function Terms() {
   return (
     <main className="terms">
       <a className="terms-back" href="/">
         &lt;- Back to the LARP meter
       </a>
-      <h1>Terms, refunds & privacy</h1>
+      <h1>Terms & privacy</h1>
       <p className="kicker">Last updated October 11, 2026</p>
 
       <h2>What Sharp or Larp is</h2>
@@ -18,48 +18,20 @@ export default function Terms() {
         anyone's skills, and should not be used to make hiring decisions.
       </p>
 
-      <h2>Ads</h2>
-      <p>
-        An ad costs $10 USD and is shown for 7 days on the side of the site and in the scrolling
-        strips on phones. It is published automatically right after payment and shows your name,
-        a short headline, a link (your LinkedIn, your startup or your site), an optional image,
-        and the score from your check. The score comes from the check you ran and cannot be
-        edited.
-      </p>
-      <p>
-        Ads must point to your own profile, project or company. The link and the image must not
-        be offensive, misleading, illegal or harmful (no scams, malware or adult content). We
-        remove ads that break these rules.
-      </p>
-
-      <h2>Refunds</h2>
-      <p>
-        If every ad spot was taken by the time your payment went through, your ad can't be
-        published and you are refunded automatically and in full. Once an ad is live it has been
-        delivered, so it is not refunded. If something went wrong with your ad, write to us
-        within 7 days and we will sort it out.
-      </p>
-
-      <h2>Payments</h2>
-      <p>
-        Payments are handled by Stripe. We never see or store your card details.
-      </p>
-
       <h2>Your data</h2>
       <p>
         A CV is read in your browser; its text and links are sent to our server and to an AI
         model provider to produce the verdict, then discarded. For each check we keep the GitHub
-        username and the score, so an ad or the leaderboard can show it. Anyone can add a checked
-        GitHub profile to the leaderboard; it then shows that profile's username, avatar and latest
-        score. To have a profile removed, write to us. We also keep each verdict for 30 days, so
-        that checking the same unchanged profile again gives the same verdict. For ads we keep the name, headline, link,
-        image and score while the ad runs. We use no tracking cookies. Share cards are drawn in
-        your browser and never sent to us.
+        username, avatar and score, so the leaderboard can show it. Anyone can add a checked
+        GitHub profile to the leaderboard; it then shows that profile's username, avatar and
+        latest score. To have a profile removed, write to us. We also keep each verdict for 30
+        days, so that checking the same unchanged profile again gives the same verdict. We use no
+        tracking cookies. Share cards are drawn in your browser and never sent to us.
       </p>
 
       <h2>Contact</h2>
       <p>
-        Questions, refunds or removal requests: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+        Questions or removal requests: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
       </p>
     </main>
   )
