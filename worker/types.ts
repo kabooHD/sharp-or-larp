@@ -134,6 +134,26 @@ export type AdCheckoutResponse = {
   url: string
 }
 
+export type LeaderboardEntry = {
+  login: string
+  avatarUrl: string | null
+  larpPercent: number
+  updatedAt: number
+}
+
+export type LeaderboardResponse = {
+  sharpest: LeaderboardEntry[]
+  larpiest: LeaderboardEntry[]
+}
+
+export type Board = keyof LeaderboardResponse
+
+export type LeaderboardAddResponse = {
+  login: string
+  board: Board
+  rank: number
+}
+
 // An error that carries the HTTP status and error code to answer with.
 export class ApiError extends Error {
   status: ContentfulStatusCode

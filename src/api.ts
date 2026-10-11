@@ -4,6 +4,8 @@ import type {
   AdsResponse,
   AnalyzeResponse,
   CvInput,
+  LeaderboardAddResponse,
+  LeaderboardResponse,
 } from '../worker/types.ts'
 
 const ERROR_MESSAGES: Record<string, string> = {
@@ -20,7 +22,8 @@ const ERROR_MESSAGES: Record<string, string> = {
   daily_limit_reached: "Today's checks are all used up. The LARP meter is back tomorrow.",
   llm_failed: 'The LARP meter jammed. Try again.',
   invalid_ad: 'Check the fields: a name, a short headline and a working link.',
-  check_expired: 'Your result has expired. Run the check again, then place your ad.',
+  check_expired: 'That result has expired. Run the check again.',
+  ads_paused: 'Ads are paused for now.',
   ads_sold_out: 'Every ad slot is taken right now. Come back in a few days.',
   stripe_failed: 'Payment is unavailable right now. Try again later.',
   body_too_large: 'That is too much text to send.',
@@ -65,4 +68,14 @@ export function fetchAds() {
 // Starts paying for an ad and returns the Stripe page to send the visitor to.
 export function startAdCheckout(ad: AdRequest, turnstileToken: string) {
   return postJson<AdCheckoutResponse>('/api/ads/checkout', { ...ad, turnstileToken })
+}
+
+// Loads both boards: the sharpest profiles and the larpiest.
+export function fetchLeaderboard() {
+  return callApi<LeaderboardResponse>('/api/leaderboard')
+}
+
+// Puts the profile of a check on the leaderboard and returns its place.
+export function addToLeaderboard(checkId: string) {
+  return postJson<LeaderboardAddResponse>('/api/leaderboard', { checkId })
 }

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type SubmitEvent } from 'react'
-import type { AdsResponse, AnalyzeResponse } from '../worker/types.ts'
+import type { AdsResponse, AnalyzeResponse, Board } from '../worker/types.ts'
 import {
   AdCard,
   AdEmptyCard,
@@ -12,14 +12,17 @@ import {
 import { analyzeProfile, errorMessage, fetchAds } from './api.ts'
 import CvPicker, { type PickedCv } from './CvPicker.tsx'
 import LarpMeter from './LarpMeter.tsx'
+import Leaderboard, { AddToLeaderboard } from './Leaderboard.tsx'
 import LoadingPhrase from './LoadingPhrase.tsx'
 import ShareSheet from './ShareSheet.tsx'
 import { CONTACT_EMAIL } from './Terms.tsx'
+import { useLeaderboard } from './useLeaderboard.ts'
 import { useTurnstile } from './useTurnstile.ts'
 import Verdict from './Verdict.tsx'
 import VerdictFlash from './VerdictFlash.tsx'
 import { larpZone } from './zones.ts'
 
+const ADS_ENABLED = false
 const PLACEHOLDERS_PER_COLUMN = 2
 const AUTHOR_URL = 'https://simon-mounier.com'
 
@@ -57,10 +60,14 @@ export default function App() {
   const [error, setError] = useState<string | null>(null)
   const [hint, setHint] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const [adSettings, setAdSettings] = useState<AdsResponse | null | undefined>(undefined)
+  const [adSettings, setAdSettings] = useState<AdsResponse | null | undefined>(
+    ADS_ENABLED ? undefined : null,
+  )
   const [buyingAd, setBuyingAd] = useState(false)
   const [sharing, setSharing] = useState(false)
   const [paymentReturn] = useState(readPaymentReturn)
+  const [boardSort, setBoardSort] = useState<Board>('sharpest')
+  const board = useLeaderboard()
   const githubInput = useRef<HTMLInputElement>(null)
   const {
     container: humanCheckBox,
@@ -70,6 +77,9 @@ export default function App() {
   } = useTurnstile('analyze')
 
   useEffect(() => {
+    if (!ADS_ENABLED) {
+      return
+    }
     fetchAds()
       .then(setAdSettings)
       .catch(() => setAdSettings(null))
@@ -93,6 +103,7 @@ export default function App() {
         throw new Error(errorMessage('bot_check_failed'))
       }
       setResult(await analyzeProfile(github.trim() || null, cv?.input ?? null, humanToken))
+      board.reload()
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : String(caught))
     } finally {
@@ -151,10 +162,12 @@ export default function App() {
       {adsLoading && <div className="ticker ticker-top" aria-hidden="true" />}
 
       <div className="layout">
-        <aside className="ads" aria-label="Ads">
-          <p className="ads-label">Sponsored</p>
-          {adColumn(0)}
-        </aside>
+        {ADS_ENABLED && (
+          <aside className="ads" aria-label="Ads">
+            <p className="ads-label">Sponsored</p>
+            {adColumn(0)}
+          </aside>
+        )}
 
         <main className="page">
           {paymentReturn && (
@@ -228,18 +241,40 @@ export default function App() {
               larpPercent={verdict.larpPercent}
               settings={adSettings ?? null}
               canPlaceAd={score !== null && freeSlots > 0}
+              canRank={Boolean(score?.githubLogin)}
               onBuy={openAdForm}
               onShare={() => setSharing(true)}
-            />
+            >
+              {score?.githubLogin && (
+                <AddToLeaderboard
+                  key={score.checkId}
+                  checkId={score.checkId}
+                  onAdded={(added) => {
+                    setBoardSort(added.board)
+                    board.reload()
+                  }}
+                />
+              )}
+            </ScoreOffer>
           )}
+
+          <Leaderboard
+            boards={board.boards}
+            error={board.error}
+            sort={boardSort}
+            onSort={setBoardSort}
+            highlightLogin={result?.login ?? null}
+          />
 
           <SiteFooter />
         </main>
 
-        <aside className="ads" aria-label="Ads">
-          <p className="ads-label">Sponsored</p>
-          {adColumn(1)}
-        </aside>
+        {ADS_ENABLED && (
+          <aside className="ads" aria-label="Ads">
+            <p className="ads-label">Sponsored</p>
+            {adColumn(1)}
+          </aside>
+        )}
       </div>
 
       {adSettings && (

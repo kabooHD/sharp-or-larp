@@ -20,6 +20,7 @@ import {
   type GithubOverview,
 } from './github.ts'
 import { judgeVibe, parseVibe, vibeFingerprint } from './judge.ts'
+import { refreshLeaderboard } from './leaderboard.ts'
 import { combineVerdict, scoreFacts } from './score.ts'
 import {
   ApiError,
@@ -154,10 +155,19 @@ export async function analyze(c: AppContext) {
   })
 
   const login = overview?.login ?? null
-  const response: AnalyzeResponse = {
-    checkId: await saveCheck(c.env.DB, { githubLogin: login, larpPercent: verdict.larpPercent }),
-    login,
+  const check = {
+    githubLogin: login,
+    larpPercent: verdict.larpPercent,
     avatarUrl: overview?.avatarUrl ?? null,
+  }
+  if (login) {
+    await refreshLeaderboard(c.env.DB, { ...check, githubLogin: login })
+  }
+
+  const response: AnalyzeResponse = {
+    checkId: await saveCheck(c.env.DB, check),
+    login,
+    avatarUrl: check.avatarUrl,
     verdict,
   }
   return c.json(response)

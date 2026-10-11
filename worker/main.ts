@@ -12,6 +12,7 @@ import {
   requireHuman,
   requireOwnSiteJson,
 } from './guards.ts'
+import { addToLeaderboard, listLeaderboard } from './leaderboard.ts'
 import { ApiError } from './types.ts'
 
 const app = new Hono<{ Bindings: Env }>()
@@ -40,6 +41,14 @@ app.post(
   limitCheckouts,
   requireHuman('checkout'),
   createAdCheckout,
+)
+app.get('/api/leaderboard', limitApiCalls, listLeaderboard)
+app.post(
+  '/api/leaderboard',
+  limitApiCalls,
+  requireOwnSiteJson,
+  bodyLimit({ maxSize: 4 * 1024, onError: bodyTooLarge }),
+  addToLeaderboard,
 )
 app.post(
   '/api/stripe/webhook',

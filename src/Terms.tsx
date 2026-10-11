@@ -8,7 +8,7 @@ export default function Terms() {
         &lt;- Back to the LARP meter
       </a>
       <h1>Terms, refunds & privacy</h1>
-      <p className="kicker">Last updated October 9, 2026</p>
+      <p className="kicker">Last updated October 11, 2026</p>
 
       <h2>What Sharp or Larp is</h2>
       <p>
@@ -49,7 +49,9 @@ export default function Terms() {
       <p>
         A CV is read in your browser; its text and links are sent to our server and to an AI
         model provider to produce the verdict, then discarded. For each check we keep the GitHub
-        username and the score, so an ad can show it. We also keep each verdict for 30 days, so
+        username and the score, so an ad or the leaderboard can show it. Anyone can add a checked
+        GitHub profile to the leaderboard; it then shows that profile's username, avatar and latest
+        score. To have a profile removed, write to us. We also keep each verdict for 30 days, so
         that checking the same unchanged profile again gives the same verdict. For ads we keep the name, headline, link,
         image and score while the ad runs. We use no tracking cookies. Share cards are drawn in
         your browser and never sent to us.

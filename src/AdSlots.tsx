@@ -1,4 +1,4 @@
-import { useEffect, useState, type SubmitEvent } from 'react'
+import { useEffect, useState, type ReactNode, type SubmitEvent } from 'react'
 import type { Ad, AdsResponse, AdText } from '../worker/types.ts'
 import { toAdImage } from './adImage.ts'
 import { errorMessage, startAdCheckout } from './api.ts'
@@ -156,12 +156,22 @@ type OfferProps = {
   larpPercent: number
   settings: AdsResponse | null
   canPlaceAd: boolean
+  canRank: boolean
   onBuy: () => void
   onShare: () => void
+  children?: ReactNode
 }
 
-// Under the verdict: show the score off with an ad, or share the score card.
-export function ScoreOffer({ larpPercent, settings, canPlaceAd, onBuy, onShare }: OfferProps) {
+// Under the verdict: show the score off with an ad, the leaderboard or a card.
+export function ScoreOffer({
+  larpPercent,
+  settings,
+  canPlaceAd,
+  canRank,
+  onBuy,
+  onShare,
+  children,
+}: OfferProps) {
   const zone = larpZone(larpPercent)
   const score = <strong style={{ color: zone.color }}>{larpPercent}% larp</strong>
 
@@ -174,10 +184,13 @@ export function ScoreOffer({ larpPercent, settings, canPlaceAd, onBuy, onShare }
           Put your {score} next to your LinkedIn, your startup or your site (${settings.priceUsd}{' '}
           for {settings.days} days), or share the score card.
         </p>
+      ) : canRank ? (
+        <p>Put this {score} on the leaderboard, or share it as a card.</p>
       ) : (
         <p>Share your {score}: a card with the score, the meter and the roast.</p>
       )}
       <div className="offer-actions">
+        {children}
         {canPlaceAd && (
           <button type="button" onClick={onBuy}>
             Place my ad

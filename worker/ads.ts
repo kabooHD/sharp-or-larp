@@ -14,6 +14,7 @@ type AppContext = Context<{ Bindings: Env }>
 
 type NewAd = AdText & SavedCheck & { imageId: string | null }
 
+const ADS_ENABLED = false
 const AD_SLOTS = 8
 const AD_DAYS = 7
 const AD_PRICE_CENTS = 1000
@@ -203,6 +204,9 @@ async function createStripeCheckout(ad: NewAd, origin: string, secretKey: string
 
 // Starts buying an ad slot: checks the ad and sends back Stripe's page URL.
 export async function createAdCheckout(c: AppContext) {
+  if (!ADS_ENABLED) {
+    throw new ApiError(503, 'ads_paused')
+  }
   const { checkId, imageJpeg, ...text } = await readAdRequest(c)
   const check = await findRecentCheck(c.env.DB, checkId)
 

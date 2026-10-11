@@ -33,10 +33,12 @@ Open `http://localhost:5173`. To test ad payments, forward Stripe's webhooks wit
 
 ```
 src/                React front
-├── App.tsx         The page: form, meter, verdict, ad slots, footer
+├── App.tsx         The page: form, meter, verdict, ad slots (paused: ADS_ENABLED), footer
 ├── LarpMeter.tsx   The dial
 ├── gauge.ts        The dial's geometry, shared with the share card
 ├── Verdict.tsx     Roast, red and green flags
+├── Leaderboard.tsx The leaderboard under the meter, and the button that adds a profile to it
+├── useLeaderboard.ts Loads the leaderboard, and reloads it after a check or an add
 ├── VerdictFlash.tsx  Quick flash of colored dots when a verdict lands
 ├── ShareSheet.tsx  Share the score: LinkedIn, phone share menu, download
 ├── shareCard.ts    Draws the score card image in the browser
@@ -61,8 +63,9 @@ worker/             API server (Cloudflare Worker)
 ├── score.ts        Scores the numbers, then blends in the LLM's gut feeling
 ├── judge.ts        Asks Claude Haiku for its gut feeling on the texts
 ├── vibeCache.ts    Keeps that gut feeling, so unchanged texts get the same verdict again
-├── checks.ts       Saves each score, so an ad can show it untouched
-├── ads.ts          Ad slots, images, Stripe checkout and webhook
+├── checks.ts       Saves each score, so an ad or the leaderboard can show it untouched
+├── leaderboard.ts  The two boards (sharpest, larpiest), adding a profile, keeping scores current
+├── ads.ts          Ad slots, images, Stripe checkout and webhook (paused: ADS_ENABLED)
 └── types.ts        Shapes shared with the front, and ApiError
 migrations/         Database tables (D1)
 public/fonts/       Inter and IBM Plex Mono, self-hosted
